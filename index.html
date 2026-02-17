@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERgency</title>
+
+<style>
+    /* Modal Styles */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.5); 
+}
+
+.modal-content {
+    background-color: white;
+    color: black;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+}
+
+.modal input {
+    width: 90%;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.modal button {
+    padding: 8px 16px;
+    background: #00aaff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal button:hover {
+    background: #0088cc;
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #004e92, #000428);
+    color: white;
+    #signInBtn {
+    padding: 8px 16px;
+    background: #00aaff;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#signInBtn:hover {
+    background: #0088cc;
+}
+}
+
+header {
+    background: #002244;
+padding: 15px 30px;
+display: flex;
+align-items: center;
+justify-content: flex-start;
+ background: #002244;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header img {
+   height: 200px;
+vertical-align: middle;
+border-radius: 12px;
+}
+
+header h1 {
+font-size: 90px;      /* Keep your big size */
+    font-weight: bold;
+    margin: 0;            /* Remove default top/bottom margin */
+    line-height: 1.1;  
+}
+.tagline {
+font-size: 14px; /* Smaller like subscript */
+color: #00c6ff;
+margin-top: 4px;
+letter-spacing: 1px;
+}
+
+
+.title-container {
+display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Keeps text aligned to left */
+    line-height: 1.1; /* Tighter spacing between h1 and tagline */
+    margin-left: 15px; /* Space from logo */
+}
+
+
+.tagline {
+  margin-top: 5px; /* small gap below ERgency */
+    font-size: 20px; /* slightly bigger for visibility */
+    color: #00c6ff;
+    font-weight: 500;
+    letter-spacing: 1px;}
+    .red-text {
+    color: red;}
+
+.container {
+    padding: 20px;
+    max-width: 900px; /* Limits width so cards don't stretch too much */
+    margin: 0 auto;
+}
+
+button {
+    padding: 8px 12px;
+    margin: 5px;
+    border: none;
+    background: #00c6ff;
+    color: black;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #00aaff;
+}
+
+/* --- NEW BALANCED LAYOUT --- */
+.hospital-card {
+    background: white;
+    color: black;
+    margin: 15px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex; /* Enables side-by-side layout */
+    flex-direction: row; /* Default: Image Left, Text Right */
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.hospital-card img {
+    width: 35%; /* Image takes 35% of the card */
+    height: 280px; /* Fixed height for consistency */
+    object-fit: cover; /* Ensures image doesn't stretch */
+}
+
+.card-info {
+    padding: 20px;
+    width: 65%; /* Text takes the remaining 65% */
+}
+
+/* Mobile View: Stack them vertically */
+@media (max-width: 768px) {
+    .hospital-card {
+        flex-direction: column;
+    }
+    .hospital-card img {
+        width: 100%;
+        height: 200px;
+    }
+    .card-info {
+        width: 100%;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+}
+/* --------------------------- */
+
+.available {
+    color: green;
+    font-weight: bold;
+}
+
+.not-available {
+    color: red;
+    font-weight: bold;
+}
+
+.page { display: none; }
+.active { display: block; }
+
+input, select {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 5px;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+    <!-- Sign In Modal -->
+<div id="signInModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeSignIn()">&times;</span>
+    <h2>Sign In</h2>
+    <form id="signInForm">
+      <label for="name">Name:</label><br>
+      <input type="text" id="name" required><br><br>
+      
+      <label for="contact">Phone or Email:</label><br>
+      <input type="text" id="contact" required><br><br>
+      
+      <button type="button" onclick="sendOTP()">Send OTP</button><br><br>
+      
+      <div id="otpDiv" style="display:none;">
+        <label for="otp">Enter OTP:</label><br>
+        <input type="text" id="otp"><br><br>
+        <button type="button" onclick="verifyOTP()">Verify OTP</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<header>
+   <img src="i.jpeg" alt="ERgency Logo">
+<div class="title-container">
+<h1>ER<span class="red-text">gency</span></h1>
+<span class="tagline">When Every Second Counts</span>
+</div>
+<div class="header-right">
+    <button id="signInBtn">Sign In</button>
+</div>
+</header>
+
+<div class="container">
+
+<div id="homePage" class="page active">
+
+<h2>Find Hospitals Near You</h2>
+
+<button onclick="findLocation()">📍 Find My Location</button>
+<input type="text" placeholder="Example: Noida Sector 52">
+<button onclick="loadHospitals()">Search</button>
+<button onclick="startVoice()">🎤 Voice Command</button>
+
+<br><br>
+
+<select id="specializationFilter" onchange="filterHospitals()">
+<option value="all">All Specialists</option>
+<option value="cardio">Cardiologist</option>
+<option value="neuro">Neurologist</option>
+<option value="ortho">Orthopedic</option>
+<option value="gyno">Gynecologist</option>
+</select>
+
+<div id="hospitalList"></div>
+
+</div>
+
+<div id="doctorPage" class="page">
+<h2 id="doctorTitle"></h2>
+<div id="doctorList"></div>
+<button onclick="goHome()">⬅ Back</button>
+</div>
+
+</div>
+
+<script>
+    // Open Modal
+document.getElementById("signInBtn").onclick = function() {
+    document.getElementById("signInModal").style.display = "block";
+}
+
+// Close Modal
+function closeSignIn() {
+    document.getElementById("signInModal").style.display = "none";
+    document.getElementById("otpDiv").style.display = "none";
+    document.getElementById("signInForm").reset();
+}
+
+// Generate a random OTP
+let generatedOTP = "";
+
+function sendOTP() {
+    const name = document.getElementById("name").value;
+    const contact = document.getElementById("contact").value;
+
+    if (!name || !contact) {
+        alert("Please enter Name and Contact");
+        return;
+    }
+
+    generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    alert("Your OTP is: " + generatedOTP);
+    document.getElementById("otpDiv").style.display = "block";
+}
+
+// Verify OTP
+function verifyOTP() {
+    const otpInput = document.getElementById("otp").value;
+    if (otpInput === generatedOTP) {
+        alert("Sign In Successful! Welcome, " + document.getElementById("name").value);
+        closeSignIn();
+    } else {
+        alert("Incorrect OTP. Please try again.");
+    }
+}
+
+
+let hospitals = [
+{
+name:"Fortis Hospital",
+contact:"0120-1234567",
+specialization:"cardio",
+address:"Sector 62, Noida",
+distance:"2.1 km",
+beds:45,
+oxygen:true,
+medicines:true,
+ventilators:true,
+emergency:true,
+image:"https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=1200",
+doctors:[
+{name:"Dr. Rajiv Sharma", field:"Cardiologist", exp:"12 Years"},
+{name:"Dr. Aditi Mehra", field:"Cardiologist", exp:"9 Years"}
+]
+},
+{
+name:"Kailash Hospital",
+contact:"0120-7654321",
+specialization:"neuro",
+address:"Sector 27, Noida",
+distance:"3.5 km",
+beds:32,
+oxygen:true,
+medicines:false,
+ventilators:true,
+emergency:true,
+image:"https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200",
+doctors:[
+{name:"Dr. Meena Kapoor", field:"Neurologist", exp:"10 Years"}
+]
+},
+{
+name:"Metro Hospital",
+contact:"0120-8889999",
+specialization:"ortho",
+address:"Sector 11, Noida",
+distance:"4 km",
+beds:28,
+oxygen:true,
+medicines:true,
+ventilators:false,
+emergency:true,
+image:"https://images.unsplash.com/photo-1576765607924-b8d6b9e5a6c3?q=80&w=1200",
+doctors:[
+{name:"Dr. Anil Verma", field:"Orthopedic", exp:"15 Years"}
+]
+},
+{
+name:"Prayag Hospital",
+contact:"0120-4567890",
+specialization:"gyno",
+address:"Sector 41, Noida",
+distance:"1.8 km",
+beds:20,
+oxygen:true,
+medicines:true,
+ventilators:true,
+emergency:true,
+image:"https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200",
+doctors:[
+{name:"Dr. Sneha Gupta", field:"Gynecologist", exp:"8 Years"}
+]
+},
+{
+name:"Max Hospital",
+contact:"0120-1112222",
+specialization:"cardio",
+address:"Sector 19, Noida",
+distance:"5 km",
+beds:50,
+oxygen:true,
+medicines:true,
+ventilators:true,
+emergency:true,
+image:"https://images.unsplash.com/photo-1584982751601-97dcc096659c?q=80&w=1200",
+doctors:[
+{name:"Dr. Karan Malhotra", field:"Cardiologist", exp:"14 Years"}
+]
+},
+{
+name:"Jaypee Hospital",
+contact:"0120-3334444",
+specialization:"neuro",
+address:"Sector 128, Noida",
+distance:"6 km",
+beds:40,
+oxygen:false,
+medicines:true,
+ventilators:true,
+emergency:true,
+image:"https://images.unsplash.com/photo-1504439468489-c8920d796a29?q=80&w=1200",
+doctors:[
+{name:"Dr. Neha Arora", field:"Neurologist", exp:"11 Years"}
+]
+}
+];
+
+function facilityStatus(value){
+return value 
+? `<span class="available">Available</span>` 
+: `<span class="not-available">Not Available</span>`;
+}
+
+function loadHospitals(){
+displayHospitals(hospitals);
+}
+
+function displayHospitals(list){
+let output="";
+list.forEach((h,index)=>{
+output+=`
+<div class="hospital-card">
+    <img src="${h.image}">
+    <div class="card-info">
+        <h3>${h.name}</h3>
+        <p><b>Contact:</b> 📞 ${h.contact}</p>
+        <p><b>Address:</b> ${h.address}</p>
+        <p><b>Distance:</b> ${h.distance}</p>
+        <p><b>Beds:</b> ${h.beds}</p>
+        <p><b>Oxygen:</b> ${facilityStatus(h.oxygen)}</p>
+        <p><b>Medicines:</b> ${facilityStatus(h.medicines)}</p>
+        <p><b>Ventilators:</b> ${facilityStatus(h.ventilators)}</p>
+        <p><b>Emergency Ward:</b> ${facilityStatus(h.emergency)}</p>
+        <div style="margin-top:10px;">
+            <button onclick="callAmbulance()">🚑 Ambulance (108)</button>
+            <button onclick="showDoctors(${index})">👨‍⚕️ View Doctors</button>
+        </div>
+    </div>
+</div>
+`;
+});
+document.getElementById("hospitalList").innerHTML=output;
+}
+
+function showDoctors(index){
+let hospital=hospitals[index];
+document.getElementById("homePage").classList.remove("active");
+document.getElementById("doctorPage").classList.add("active");
+document.getElementById("doctorTitle").innerText="Doctors at "+hospital.name;
+
+let doctorHTML="";
+hospital.doctors.forEach(d=>{
+doctorHTML+=`
+<div class="hospital-card" style="display:block; padding:20px;">
+<h3>${d.name}</h3>
+<p>${d.field}</p>
+<p>Experience: ${d.exp}</p>
+</div>
+`;
+});
+document.getElementById("doctorList").innerHTML=doctorHTML;
+}
+
+function goHome(){
+document.getElementById("doctorPage").classList.remove("active");
+document.getElementById("homePage").classList.add("active");
+}
+
+function filterHospitals(){
+let value=document.getElementById("specializationFilter").value;
+if(value==="all"){
+displayHospitals(hospitals);
+}else{
+let filtered=hospitals.filter(h=>h.specialization===value);
+displayHospitals(filtered);
+}
+}
+
+function callAmbulance(){
+window.location.href="tel:108";
+}
+
+function findLocation(){
+if(navigator.geolocation){
+navigator.geolocation.getCurrentPosition(function(){
+alert("Location detected!");
+loadHospitals();
+});
+}
+}
+
+function startVoice(){
+let recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+recognition.start();
+recognition.onresult=function(event){
+let command=event.results[0][0].transcript.toLowerCase();
+if(command.includes("cardio")) document.getElementById("specializationFilter").value="cardio";
+if(command.includes("neuro")) document.getElementById("specializationFilter").value="neuro";
+if(command.includes("ortho")) document.getElementById("specializationFilter").value="ortho";
+if(command.includes("gyno")) document.getElementById("specializationFilter").value="gyno";
+filterHospitals();
+}
+}
+
+loadHospitals();
+
+</script>
+
+</body>
+</html>
